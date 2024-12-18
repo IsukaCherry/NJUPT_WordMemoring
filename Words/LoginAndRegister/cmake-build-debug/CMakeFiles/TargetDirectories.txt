@@ -1,3 +1,0 @@
-D:/ClionProject/Words/LoginAndRegister/cmake-build-debug/CMakeFiles/RemenberWords.dir
-D:/ClionProject/Words/LoginAndRegister/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/ClionProject/Words/LoginAndRegister/cmake-build-debug/CMakeFiles/rebuild_cache.dir
