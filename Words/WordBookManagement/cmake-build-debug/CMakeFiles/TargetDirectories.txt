@@ -1,3 +1,0 @@
-D:/ClionProject/Words/WordBookManagement/cmake-build-debug/CMakeFiles/WordBookManagement.dir
-D:/ClionProject/Words/WordBookManagement/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/ClionProject/Words/WordBookManagement/cmake-build-debug/CMakeFiles/rebuild_cache.dir
