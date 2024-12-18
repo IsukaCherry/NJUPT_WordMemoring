@@ -6,4 +6,5 @@ int Login();
 int RegisterUser();
 int WordBook();
 void DayPlusOne();
+int ReadTime(char* fname,Time time[]);
 #endif

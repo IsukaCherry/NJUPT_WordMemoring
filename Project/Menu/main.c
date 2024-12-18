@@ -9,7 +9,11 @@ User users[100];
 User Logined[1];
 Word wordbook[10000];
 Word wrongwords[10000];
+Time LoginTime[100];
+Time CurrentTime[100];
+int TotalWords=0;
 int success=0;
+int Bianhao=0;
 
 int main() {
     SetConsoleOutputCP(65001);
@@ -46,13 +50,12 @@ int main() {
             printf("1. 查看你的信息\n");
             printf("2. 进入单词本菜单\n");
             printf("3. 进入学习模式\n");
-            printf("4. 打卡\n");
-            printf("0. 退出登录\n");
+            printf("0. 退出登录并打卡\n");
             printf("请选择：");
             scanf("%d", &button);
             switch (button) {
                 case 1:
-                    printf("你的用户名为:%s\n你的密码为:%s\n你的总得分为%d\n你的打卡天数为:%d",
+                    printf("你的用户名为:%s\n你的密码为:%s\n你先前的总得分为%d\n你的打卡天数为:%d",
                         Logined[0].UsersName,Logined[0].Password,Logined[0].score,Logined[0].daysStudied);
                 break;
                 case 2:
@@ -61,11 +64,9 @@ int main() {
                 case 3:
                     button=3;
                 break;
-                case 4:
-                    DayPlusOne();
-                break;
                 case 0:
-                    printf("退出成功.\n");
+                    DayPlusOne();
+                    printf("退出成功,已为您打卡(一天只能打卡一次哦)\n");
                 success=0;
                 break;
                 default:

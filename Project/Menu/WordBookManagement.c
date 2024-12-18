@@ -178,4 +178,5 @@ void ViewWords()
     printf("%d\n",WordCount);
     for(int i=0;i<=WordCount;i++)
         printf("%s %s %s\n",wordbook[i].word, wordbook[i].partOfSpeech, wordbook[i].meaning);
+    printf("%d",WordCount);
 }

@@ -4,15 +4,21 @@
 #include <time.h>
 #include "struct.h"
 #include "MemorizeWords.h"
+#include "LoginRegister.h"
+
+extern User users[100];
 extern Word wrongwords[10000];
 extern Word wordbook[10000];
 extern User Logined[1];
+extern int TotalWords;
+extern int Bianhao;
 char HelpWord[1000][100]={0};
 int assitant=0;
-int score=0;
 int HighestMark=0;
 int Viewtimes=0;
 char location[100];
+int score=0;
+
 void ViewWrongWords()
 {
     char str1[]="D:/ClionProject/Project/WrongWordList/";
@@ -26,7 +32,6 @@ void ViewWrongWords()
         strcpy(location, strcat(str1,temp0));
         Viewtimes++;
     }
-    printf("%s",location);
     int WordCount=ReadWordBook(location, wrongwords);
     for(int i=0;i<WordCount;i++)
         printf("%s %s %s \n",wrongwords[i].word, wrongwords[i].partOfSpeech, wrongwords[i].meaning);
@@ -39,9 +44,9 @@ void StartLearning()
     int ways,mode;
     do
     {
-        printf("选择你的学习方式：\n");
-        printf("1.英文提示->输入中文\n");
-        printf("2.中文提示->输入英文\n");
+        printf("选择你的提示模式：\n");
+        printf("1.提供英文提示\n");
+        printf("2.提供中文提示\n");
         printf("0.退出\n");
         printf("请输入你的选项: ");
         scanf("%d", &ways);
@@ -72,7 +77,7 @@ void StartLearning()
         }
         do
         {
-            printf("请选择你的学习模式\n");
+            printf("请选择你的学习方式\n");
             printf("1.选择题\n");
             printf("2.填空题\n");
             printf("0.退出\n");
@@ -100,6 +105,8 @@ void StartLearning()
 
 void FourQuestions()
 {
+    char booklist[MAX]="D:/ClionProject/Project/WordList/wordbook.txt";
+    int WordCount=ReadWordBook(booklist, wordbook);
     char str1[]="D:/ClionProject/Project/WrongWordList/";
     char str2[]=".txt";
     if(Viewtimes==0) {
@@ -117,7 +124,7 @@ void FourQuestions()
     {
         printf("请输入你今天想学的单词数");
         scanf("%d",&numbers);
-        if(numbers<=0 || numbers>(TotalWords/4))
+        if(numbers<=0 || numbers>(WordCount/4))
         {
             printf("输入无效，请再输一次！\n");
             continue;
@@ -127,21 +134,22 @@ void FourQuestions()
             printf("Emmm，有点少，但我们还是开始吧\n");
             break;
         }
-        if (numbers>10 && numbers<=(TotalWords/4))
+        if (numbers>10 && numbers<=(WordCount/4))
         {
             printf("Wow，你太棒了，我们开始吧\n");
             break;
         }
-    }while (!(numbers>0 && numbers<=(TotalWords/4)));
-    HighestMark+=numbers*10;
-    int generatedNumbers[TotalWords] = {0};
+    }while (!(numbers>0 && numbers<=(WordCount/4)));
+    HighestMark+=Logined[0].score+numbers*10;
+    int generatedNumbers[WordCount];
+    memset(generatedNumbers, 0, sizeof(generatedNumbers));
     int RandNumbers[numbers][4];
     int i, j, num;
     srand(time(0));
     for (i = 0; i < numbers; i++) {
         for (j = 0; j < 4;)
         {
-            num = rand() % (TotalWords);
+            num = rand() % (WordCount);
             if (generatedNumbers[num] == 0)
             {
                 RandNumbers[i][j] = num;
@@ -191,21 +199,39 @@ void FourQuestions()
         }
     }
     fclose(fp);
+    if ((score+Logined[0].score)==HighestMark)
+    {
+        printf("真棒，你完美的完成了本次背诵！");
+    }
+    else {
+        printf("可惜,你这次有错，错题已经记录下来了，你可以随时复习");
+    }
+    char filename[MAX]="D:/ClionProject/Project/Users/users.txt";
+    int UserCount=ReadUsersInf(filename, users);
+    users[Bianhao].score=Logined[0].score+score;
+    FILE *fp1 = fopen("D:/ClionProject/Project/Users/users.txt", "w");
+    for (int i = 0; i < UserCount; i++)
+    {
+        fprintf(fp, "%s %s %d %d\n", users[i].UsersName, users[i].Password, users[i].score, users[i].daysStudied);
+    }
+    fclose(fp1);
 }//选择题
 
 void SpellWords()
 {
+    char booklist[MAX]="D:/ClionProject/Project/WordList/wordbook.txt";
+    int WordCount=ReadWordBook(booklist, wordbook);
     char str1[]="D:/ClionProject/Project/WrongWordList/";
     char str2[]=".txt";
     if(Viewtimes==0) {
         char temp0[100];
         char temp1[100];
-        strcpy(temp1,strcat(Logined[0].UsersName,str2));
+        strcpy(temp1,Logined[0].UsersName);
+        strcat(temp1,str2);
         strcpy(temp0,temp1);
         strcpy(location, strcat(str1,temp0));
         Viewtimes++;
     }
-    strcpy(location, strcat(str1, strcat(Logined[0].UsersName,str2)));
     FILE *fp = fopen(location, "a");//以追加模式打开错题本
     int count=ReadWordBook(location, wrongwords);
     int numbers=0;
@@ -213,7 +239,7 @@ void SpellWords()
     {
         printf("请输入你今天想学的单词数");
         scanf("%d",&numbers);
-        if(numbers<=0 || numbers>TotalWords)
+        if(numbers<=0 || numbers>WordCount)
         {
             printf("输入无效，请再输一次！\n");
             continue;
@@ -223,20 +249,21 @@ void SpellWords()
             printf("Emmm，有点少，但我们还是开始吧\n");
             break;
         }
-        if (numbers>10 && numbers<=TotalWords)
+        if (numbers>10 && numbers<=WordCount)
         {
             printf("Wow，你太棒了，我们开始吧\n");
             break;
         }
-    }while (!(numbers>0 && numbers<=TotalWords));
-    HighestMark+=numbers*10;
-    int generatedNumbers[TotalWords] = {0};
+    }while (!(numbers>0 && numbers<=WordCount));
+    HighestMark+=Logined[0].score+numbers*10;
+    int generatedNumbers[WordCount];
+    memset(generatedNumbers, 0, sizeof(generatedNumbers));
     int RandNumbers[numbers];
     int i,num;
     srand(time(0));
     for (i = 0; i < numbers; i++)
     {
-        num = rand() % (TotalWords);
+        num = rand() % (WordCount);
         if (generatedNumbers[num] == 0) \
            {
                 RandNumbers[i] = num;
@@ -248,23 +275,23 @@ void SpellWords()
         char Answer[MAX];
         if (assitant==1)
         {
-            printf("本题的提示词为：%s\n",HelpWord[RandNumbers[i]]);
+            printf("\n本题的提示词为：%s\n",HelpWord[RandNumbers[i]]);
         }
         if (assitant==2)
         {
-            printf("本题的提示词为：%s\n",HelpWord[RandNumbers[i]]);
+            printf("\n本题的提示词为：%s\n",HelpWord[RandNumbers[i]]);
         }
         printf("请输入正确的英文单词:");
         scanf("%s",&Answer);
         if (!strcmp(Answer,wordbook[RandNumbers[i]].word))
         {
             printf("输入正确，加十分！\n");
-            score+=10;//计分+10
+            score+=10;
         }
         else
         {
             printf("错误!\n正确答案是%s\n",wordbook[RandNumbers[i]].word);
-            score-=10;//计分-10
+            score-=10;
             strcpy(wrongwords[count].word,wordbook[RandNumbers[i]].word);
             strcpy(wrongwords[count].partOfSpeech,wordbook[RandNumbers[i]].partOfSpeech);
             strcpy(wrongwords[count].meaning,wordbook[RandNumbers[i]].meaning);
@@ -273,6 +300,15 @@ void SpellWords()
         }
     }
     fclose(fp);
+    char filename[MAX]="D:/ClionProject/Project/Users/users.txt";
+    int UserCount=ReadUsersInf(filename, users);
+    users[Bianhao].score=Logined[0].score+score;
+    FILE *fp1 = fopen("D:/ClionProject/Project/Users/users.txt", "w");
+    for (int i = 0; i < UserCount; i++)
+    {
+        fprintf(fp, "%s %s %d %d\n", users[i].UsersName, users[i].Password, users[i].score, users[i].daysStudied);
+    }
+    fclose(fp1);
 }//拼写题
 
 void ReLearnWrongWords()
@@ -282,7 +318,8 @@ void ReLearnWrongWords()
     if(Viewtimes==0) {
         char temp0[100];
         char temp1[100];
-        strcpy(temp1,strcat(Logined[0].UsersName,str2));
+        strcpy(temp1,Logined[0].UsersName);
+        strcat(temp1,str2);
         strcpy(temp0,temp1);
         strcpy(location, strcat(str1,temp0));
         Viewtimes++;
@@ -343,18 +380,18 @@ void ReLearnWrongWords()
 
 void ScoreManagement()//成绩查看系统
 {
+
     if (HighestMark==0)
     {
         printf("你今天还没有学习，请学习后再来吧\n");
         return;
     }
     printf("你的成绩是:%d\n",score);
-    if (score<HighestMark)
+    if (score+users[Bianhao].score<HighestMark)
     {
         printf("你没能完全掌握，是否要复习你的错题,以下是你的错题:\n");
         ViewWrongWords();
         printf("请问你需要复习你的错题吗?");
-
         ReLearnWrongWords();
     }
     else

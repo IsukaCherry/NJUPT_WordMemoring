@@ -9,4 +9,4 @@ void SpellWords();
 void ViewWrongWords();
 void ScoreManagement();
 void ReLearnWrongWords();
-#endif //MEMORIZEWORDS_H
+#endif
